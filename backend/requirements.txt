@@ -7,3 +7,5 @@ pytest
 httpx
 python-multipart
 google-generativeai
+google-cloud-firestore
+python-json-logger
