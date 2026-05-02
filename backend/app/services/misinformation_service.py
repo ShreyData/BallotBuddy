@@ -3,6 +3,8 @@ from fastapi import HTTPException
 from app.infrastructure.ai_provider import AIProvider
 from app.core.logging import logger
 
+from app.schemas.ai import MisinformationResult
+
 class MisinformationService:
     """
     Service class for checking claims against potential misinformation.
@@ -16,7 +18,7 @@ class MisinformationService:
 
     async def check_claim(self, claim: str) -> dict:
         """
-        Verifies an election-related claim using AI.
+        Verifies an election-related claim using AI with structured output.
         """
         sanitized_claim = self._sanitize_input(claim)
         
@@ -27,33 +29,35 @@ class MisinformationService:
             raise HTTPException(status_code=400, detail="Claim exceeds maximum length of 500 characters.")
 
         try:
-            prompt = (
-                f"Verify this claim about elections and explain truth: {sanitized_claim}. "
-                "Respond in JSON format with two keys: 'is_true' (boolean) and 'explanation' (string)."
+            system_instruction = (
+                "You are an expert fact-checker for Indian elections. Your task is to verify claims about "
+                "ECI procedures, EVM security, voting rights, and candidate rules in India. "
+                "Provide a clear boolean 'is_true' and a concise 'explanation' based on Indian law. "
+                "Always remain objective and neutral."
             )
-            response_text = await self.ai_provider.generate_response(prompt)
             
-            # Attempt to parse JSON from AI response
+            response_text = await self.ai_provider.generate_response(
+                prompt=f"Verify this claim: {sanitized_claim}",
+                system_instruction=system_instruction,
+                response_schema=MisinformationResult
+            )
+            
+            # Parse validated JSON directly
             try:
-                # Basic JSON extraction in case AI adds preamble/postamble
-                start = response_text.find('{')
-                end = response_text.rfind('}') + 1
-                if start != -1 and end != 0:
-                    data = json.loads(response_text[start:end])
-                    return {
-                        "claim": sanitized_claim,
-                        "is_true": data.get("is_true", False),
-                        "explanation": data.get("explanation", "No explanation provided.")
-                    }
-            except json.JSONDecodeError:
-                logger.warning(f"AI response was not valid JSON: {response_text}")
-                
-            # Fallback if parsing fails
-            return {
-                "claim": sanitized_claim,
-                "is_true": False,
-                "explanation": response_text
-            }
+                data = MisinformationResult.model_validate_json(response_text)
+                return {
+                    "claim": sanitized_claim,
+                    "is_true": data.is_true,
+                    "explanation": data.explanation
+                }
+            except Exception as e:
+                logger.warning(f"Failed to validate AI structured response: {e}. Raw response: {response_text}")
+                # Fallback in case of validation error
+                return {
+                    "claim": sanitized_claim,
+                    "is_true": False,
+                    "explanation": "Could not verify claim due to a processing error."
+                }
         except Exception as e:
             logger.error(f"MisinformationService Error: {str(e)}")
             raise HTTPException(status_code=500, detail=f"Failed to verify claim: {str(e)}")

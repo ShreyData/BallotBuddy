@@ -30,7 +30,7 @@ class AiService:
             raise HTTPException(status_code=400, detail="Question exceeds maximum length of 500 characters.")
 
         # Check Cache
-        cached_answer = self.cache_manager.get(sanitized_question)
+        cached_answer = await self.cache_manager.get(sanitized_question)
         if cached_answer:
             logger.info(f"Cache hit for question: {sanitized_question[:30]}...", extra={"user_id": user_id})
             # Even on cache hit, we might want to log the interaction or skip Firestore for efficiency
@@ -43,11 +43,32 @@ class AiService:
             }
 
         try:
-            prompt = f"Explain clearly in simple steps: {sanitized_question}"
-            answer = await self.ai_provider.generate_response(prompt)
+            # 1. Generate embedding for RAG
+            query_vector = await self.ai_provider.generate_embedding(sanitized_question)
+            
+            # 2. Retrieve relevant context from Firestore Vector Search
+            relevant_facts = await self.firestore_client.query_knowledge_base(query_vector)
+            context = "\n".join([f"- {fact}" for fact in relevant_facts]) if relevant_facts else "No specific context found."
+            
+            # 3. Formulate system instruction with grounded context
+            system_instruction = (
+                "You are BallotBuddy AI, an expert assistant for the Indian Election system. "
+                "Your goal is to explain ECI (Election Commission of India) procedures, NVSP registration, "
+                "and the EVM/VVPAT process in an easy-to-follow way. "
+                "Always be concise, accurate, and strictly non-partisan. Explain using Indian terminology (EPIC, BLO, Form 6).\n\n"
+                "Ground your response ONLY in the following provided context if relevant. "
+                "If the context doesn't contain the answer, use your knowledge of Indian election laws but state that procedures may vary slightly by state.\n\n"
+                f"CONTEXT:\n{context}"
+            )
+            
+            # 4. Generate grounded response
+            answer = await self.ai_provider.generate_response(
+                prompt=sanitized_question, 
+                system_instruction=system_instruction
+            )
             
             # Save to Cache
-            self.cache_manager.set(sanitized_question, answer)
+            await self.cache_manager.set(sanitized_question, answer)
             
             # Save to Firestore for session tracking
             await self.firestore_client.save_user_query(user_id, sanitized_question, {"answer": answer})

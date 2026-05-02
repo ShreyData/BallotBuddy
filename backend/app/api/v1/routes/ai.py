@@ -2,8 +2,7 @@ from fastapi import APIRouter, Depends
 from app.schemas.ai import AIQueryRequest, AIQueryResponse, MisinformationRequest, MisinformationResponse
 from app.services.ai_service import AiService
 from app.services.misinformation_service import MisinformationService
-from app.api.deps import get_ai_service, get_misinformation_service
-from app.core.security import get_current_user_id
+from app.api.deps import get_ai_service, get_misinformation_service, get_current_user_id
 
 router = APIRouter()
 

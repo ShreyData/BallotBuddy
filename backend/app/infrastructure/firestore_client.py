@@ -1,4 +1,6 @@
 from google.cloud import firestore
+from google.cloud.firestore_v1.vector import Vector
+from google.cloud.firestore_v1.base_vector_query import DistanceMeasure
 from app.core.config import settings
 from app.core.logging import logger
 from datetime import datetime
@@ -21,44 +23,77 @@ class FirestoreClient:
 
     async def save_user_query(self, user_id: str, query: str, response: dict) -> None:
         """
-        Saves a user query and the AI's response to Firestore.
+        Saves a user query and the AI's response to a Firestore subcollection.
         """
         if not self.db:
             logger.warning("Firestore client is not initialized. Skipping save.")
             return
 
         try:
+            # Main session document metadata
             doc_ref = self.db.collection("sessions").document(user_id)
+            await doc_ref.set({"last_updated": datetime.utcnow()}, merge=True)
+            
+            # Subcollection for queries (unbounded growth handled correctly)
             query_data = {
                 "question": query,
                 "answer": response.get("answer", ""),
                 "timestamp": datetime.utcnow()
             }
+            await doc_ref.collection("queries").add(query_data)
             
-            # Ensure document exists and then update queries array
-            await doc_ref.set({"last_updated": datetime.utcnow()}, merge=True)
-            await doc_ref.update({
-                "queries": firestore.ArrayUnion([query_data])
-            })
-            logger.info(f"Successfully saved query for user: {user_id}")
+            logger.info(f"Successfully saved query to subcollection for user: {user_id}")
         except Exception as e:
             logger.error(f"Error saving query to Firestore for user {user_id}: {e}")
 
-    async def get_user_history(self, user_id: str) -> list:
+    async def get_user_history(self, user_id: str, limit: int = 20) -> list:
         """
-        Retrieves the history of queries for a user from Firestore.
+        Retrieves the history of queries for a user from Firestore subcollection.
         """
         if not self.db:
             logger.warning("Firestore client is not initialized. Returning empty history.")
             return []
 
         try:
-            doc_ref = self.db.collection("sessions").document(user_id)
-            doc = await doc_ref.get()
+            queries_ref = self.db.collection("sessions").document(user_id).collection("queries")
+            # Query the subcollection with ordering and limit
+            docs = queries_ref.order_by("timestamp", direction=firestore.Query.DESCENDING).limit(limit).stream()
             
-            if doc.exists:
-                return doc.to_dict().get("queries", [])
-            return []
+            history = []
+            async for doc in docs:
+                history.append(doc.to_dict())
+            
+            return history
         except Exception as e:
             logger.error(f"Error retrieving history from Firestore for user {user_id}: {e}")
+            return []
+
+    async def query_knowledge_base(self, query_vector: list[float], limit: int = 3) -> list[str]:
+        """
+        Queries the 'election_facts' collection using vector search to find relevant context.
+        """
+        if not self.db:
+            return []
+
+        try:
+            collection = self.db.collection("election_facts")
+            
+            # Perform vector search
+            vector_query = collection.find_nearest(
+                vector_field="embedding",
+                query_vector=Vector(query_vector),
+                distance_measure=DistanceMeasure.COSINE,
+                limit=limit
+            )
+            
+            docs = vector_query.stream()
+            results = []
+            async for doc in docs:
+                data = doc.to_dict()
+                if "content" in data:
+                    results.append(data["content"])
+            
+            return results
+        except Exception as e:
+            logger.error(f"Error querying knowledge base via vector search: {e}")
             return []

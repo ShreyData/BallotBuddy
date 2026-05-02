@@ -6,6 +6,9 @@ python-dotenv
 pytest
 httpx
 python-multipart
-google-generativeai
+google-genai
 google-cloud-firestore
 python-json-logger
+python-jose[cryptography]
+passlib[bcrypt]
+redis

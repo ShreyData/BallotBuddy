@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { apiService } from "../../services/api";
 import { StepCard } from "../../components/StepCard";
 import { Loader } from "../../components/Loader";
@@ -9,6 +9,13 @@ export default function GuidePage() {
   const [steps, setSteps] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (!isLoading && inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [isLoading]);
 
   const fetchGuide = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -19,6 +26,11 @@ export default function GuidePage() {
     setSteps([]);
 
     try {
+      // Ensure we have a token
+      if (!localStorage.getItem("bb_auth_token")) {
+        await apiService.loginGuest();
+      }
+      
       const res = await apiService.getElectionGuide(role);
       setSteps(res.steps);
     } catch (err: any) {
@@ -32,13 +44,14 @@ export default function GuidePage() {
     <div className="max-w-3xl mx-auto">
       <div className="mb-8 text-center">
         <h1 className="text-3xl font-bold mb-2">Personalized Voting Guide</h1>
-        <p className="text-gray-600">Enter your role (e.g., voter, student, first_time_voter) to get specific instructions.</p>
+        <p className="text-gray-600">Enter your role (e.g., voter, student, first_time_voter) to get ECI-aligned instructions.</p>
       </div>
 
       <form onSubmit={fetchGuide} className="flex gap-4 mb-10 bg-white p-4 rounded-xl shadow-sm border">
         <label htmlFor="role-input" className="sr-only">Your Role</label>
         <input
           id="role-input"
+          ref={inputRef}
           type="text"
           value={role}
           onChange={(e) => setRole(e.target.value)}

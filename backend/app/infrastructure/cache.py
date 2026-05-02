@@ -1,46 +1,39 @@
-import time
-import hashlib
-from typing import Any, Optional, Dict
+import redis.asyncio as redis
+from typing import Any, Optional
+from app.core.config import settings
+from app.core.logging import logger
 
 class CacheManager:
     """
-    Thread-safe (conceptual) in-memory cache with TTL support and hashed keys.
+    Distributed cache manager using Redis for efficient scaling and TTL management.
     """
     def __init__(self, default_ttl: int = 3600):
-        self._cache: Dict[str, Dict[str, Any]] = {}
+        self._redis = redis.from_url(settings.REDIS_URL, decode_responses=True)
         self._default_ttl = default_ttl
 
-    def _hash_key(self, key: str) -> str:
-        """Creates a SHA-256 hash of the key."""
-        return hashlib.sha256(key.encode()).hexdigest()
+    async def get(self, key: str) -> Optional[Any]:
+        """
+        Retrieves a value from Redis cache.
+        """
+        try:
+            return await self._redis.get(key)
+        except Exception as e:
+            logger.error(f"Redis get error: {e}")
+            return None
 
-    def get(self, key: str) -> Optional[Any]:
+    async def set(self, key: str, value: str, ttl: Optional[int] = None):
         """
-        Retrieves a value from the cache if it hasn't expired.
+        Sets a value in Redis with a specific TTL.
         """
-        hashed_key = self._hash_key(key)
-        item = self._cache.get(hashed_key)
-        
-        if item:
-            if item["expires_at"] > time.time():
-                return item["value"]
-            else:
-                # Cleanup expired item
-                del self._cache[hashed_key]
-        
-        return None
+        try:
+            duration = ttl if ttl is not None else self._default_ttl
+            await self._redis.setex(key, duration, value)
+        except Exception as e:
+            logger.error(f"Redis set error: {e}")
 
-    def set(self, key: str, value: Any, ttl: Optional[int] = None):
-        """
-        Sets a value in the cache with a specific TTL.
-        """
-        hashed_key = self._hash_key(key)
-        duration = ttl if ttl is not None else self._default_ttl
-        self._cache[hashed_key] = {
-            "value": value,
-            "expires_at": time.time() + duration
-        }
-
-    def clear(self):
-        """Clears the entire cache."""
-        self._cache.clear()
+    async def clear(self):
+        """Clears the Redis cache."""
+        try:
+            await self._redis.flushdb()
+        except Exception as e:
+            logger.error(f"Redis flush error: {e}")

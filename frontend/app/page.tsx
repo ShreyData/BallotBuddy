@@ -2,10 +2,10 @@ export default function Home() {
   return (
     <div className="flex flex-col items-center justify-center text-center pt-20">
       <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight text-gray-900 mb-6">
-        Navigate Elections with <span className="text-blue-600">Confidence</span>
+        Navigate Indian Elections with <span className="text-blue-600">Confidence</span>
       </h1>
       <p className="text-xl text-gray-600 max-w-2xl mb-12">
-        BallotBuddy AI provides reliable, easy-to-understand guidance on voting rules, election timelines, and fact-checks misinformation in real-time.
+        BallotBuddy AI provides reliable guidance on ECI rules, NVSP registration, and fact-checks Indian election claims in real-time.
       </p>
       
       <div className="grid md:grid-cols-2 gap-6 w-full max-w-3xl">

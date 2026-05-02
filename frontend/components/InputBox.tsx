@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 
 interface InputBoxProps {
   onSubmit: (text: string) => void;
@@ -8,6 +8,14 @@ interface InputBoxProps {
 
 export function InputBox({ onSubmit, placeholder = "Type here...", isLoading = false }: InputBoxProps) {
   const [text, setText] = useState("");
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  // Focus management: return focus to input after loading finishes
+  useEffect(() => {
+    if (!isLoading && inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [isLoading]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -22,8 +30,10 @@ export function InputBox({ onSubmit, placeholder = "Type here...", isLoading = f
       <label htmlFor="user-input" className="sr-only">{placeholder}</label>
       <input
         id="user-input"
+        ref={inputRef}
         type="text"
-        value={text}
+...
+
         onChange={(e) => setText(e.target.value)}
         placeholder={placeholder}
         className="flex-1 p-3 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"

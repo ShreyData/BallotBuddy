@@ -18,3 +18,7 @@ class MisinformationResponse(BaseModel):
     claim: str
     is_true: bool
     explanation: str
+
+class MisinformationResult(BaseModel):
+    is_true: bool
+    explanation: str

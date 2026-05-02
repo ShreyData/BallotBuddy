@@ -2,24 +2,24 @@ from typing import List, Dict
 
 ELECTION_TIMELINE: List[Dict[str, str]] = [
     {
-        "phase": "Registration",
-        "description": "The period where eligible citizens sign up to be on the electoral roll."
+        "phase": "Announcement & MCC",
+        "description": "ECI announces dates; Model Code of Conduct comes into immediate effect."
     },
     {
-        "phase": "Nomination",
-        "description": "Candidates officially declare their intent to run for office."
+        "phase": "Notification & Nomination",
+        "description": "Official notification is issued; candidates file nominations and undergo scrutiny."
     },
     {
         "phase": "Campaigning",
-        "description": "Candidates present their platforms and engage with voters."
+        "description": "Candidates engage with voters; campaigning ends 48 hours before polling."
     },
     {
-        "phase": "Voting",
-        "description": "The day or period when ballots are cast by the electorate."
+        "phase": "Polling",
+        "description": "Voters cast ballots using EVM and VVPAT at designated polling stations."
     },
     {
-        "phase": "Counting & Certification",
-        "description": "Ballots are tallied and results are verified and made official."
+        "phase": "Counting & Results",
+        "description": "Votes are counted from EVMs and results are declared by the Returning Officer."
     }
 ]
 

@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { apiService } from "../../services/api";
 import { MisinformationResponse } from "../../types/api";
 import { Loader } from "../../components/Loader";
@@ -9,6 +9,13 @@ export default function MisinformationPage() {
   const [result, setResult] = useState<MisinformationResponse | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
+
+  useEffect(() => {
+    if (!isLoading && inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [isLoading]);
 
   const checkClaim = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -19,6 +26,11 @@ export default function MisinformationPage() {
     setResult(null);
 
     try {
+      // Ensure we have a token
+      if (!localStorage.getItem("bb_auth_token")) {
+        await apiService.loginGuest();
+      }
+      
       const res = await apiService.checkMisinformation(claim);
       setResult(res);
     } catch (err: any) {
@@ -39,9 +51,10 @@ export default function MisinformationPage() {
         <label htmlFor="claim-input" className="font-semibold text-gray-800">Claim to verify</label>
         <textarea
           id="claim-input"
+          ref={inputRef}
           value={claim}
           onChange={(e) => setClaim(e.target.value)}
-          placeholder="e.g. You can vote online in all states."
+          placeholder="e.g. You can vote on WhatsApp in India."
           className="w-full p-4 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-[120px]"
           required
         />

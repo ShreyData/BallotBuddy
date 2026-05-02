@@ -2,22 +2,23 @@ from typing import List, Dict
 
 ROLE_GUIDES: Dict[str, List[str]] = {
     "voter": [
-        "Register to vote: Ensure you are on the electoral roll.",
-        "Verify ID: Check which forms of identification are required at your polling station.",
-        "Vote: Cast your ballot in person, by mail, or via proxy.",
-        "Track results: Monitor official channels for certified election outcomes."
+        "Register on NVSP: Apply via Form 6 on the Voters' Service Portal (voters.eci.gov.in).",
+        "Check Electoral Roll: Verify your name in the Voter List using your EPIC number.",
+        "Locate Polling Station: Use the ECI 'Voter Helpline' app to find your specific booth.",
+        "Booth Process: First Officer checks name/ID, Second Officer inks finger, Third Officer checks ink.",
+        "Vote on EVM: Press the blue button next to your candidate's symbol on the EVM; verify the slip in the VVPAT window."
     ],
     "student": [
-        "Check eligibility: Confirm if you can vote at your home address or term-time address.",
-        "Register: Register at your chosen address (you can be registered at both, but only vote once).",
-        "Research: Use non-partisan guides to understand candidate platforms.",
-        "Vote: Participate in the democratic process."
+        "Eligibility: Ensure you are 18 on the qualifying date (Jan 1, Apr 1, Jul 1, or Oct 1).",
+        "Registration: Register at your place of ordinary residence (Hostel or Home, but only one).",
+        "EPIC Card: Ensure you have your Elector Photo Identity Card or one of the 12 alternative IDs.",
+        "ECI Resources: Follow 'SVEEP' (Systematic Voters' Education and Electoral Participation) for awareness."
     ],
     "first_time_voter": [
-        "Understand the process: Read the 'Introduction to Elections' guide.",
-        "Register: Submit your application early.",
-        "ID Preparation: Get a voter ID if you don't have another valid form.",
-        "Locate Polling Station: Find your specific voting location in advance."
+        "Application: Submit Form 6 online or to your Booth Level Officer (BLO).",
+        "ID Verification: Receive your EPIC card; check for any errors in name or address immediately.",
+        "Polling Day: Witness the EVM Mock Poll (optional) and cast your first vote securely.",
+        "Confidentiality: Remember that your vote is secret; do not take photos inside the polling booth."
     ]
 }
 

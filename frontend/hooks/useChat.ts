@@ -22,6 +22,11 @@ export function useChat() {
     setError(null);
 
     try {
+      // Ensure we have a token
+      if (!localStorage.getItem("bb_auth_token")) {
+        await apiService.loginGuest();
+      }
+
       const response: AIQueryResponse = await apiService.askAI(question);
       const aiMessage: Message = {
         id: (Date.now() + 1).toString(),

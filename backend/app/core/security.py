@@ -20,16 +20,5 @@ def create_access_token(subject: Union[str, Any], expires_delta: timedelta = Non
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     return pwd_context.verify(plain_password, hashed_password)
 
-from fastapi import Header, HTTPException
-
-def get_current_user_id(x_user_id: str = Header(default=None, alias="X-User-Id")) -> str:
-    """
-    Temporary lightweight auth preparation.
-    Validates user_id presence from request headers.
-    """
-    if not x_user_id:
-        raise HTTPException(status_code=401, detail="X-User-Id header missing")
-    return x_user_id
-
 def get_password_hash(password: str) -> str:
     return pwd_context.hash(password)
