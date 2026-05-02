@@ -116,7 +116,7 @@ To ensure the AI assistant is grounded in real election facts:
 
 ---
 
-## 📦 Submission Package Details
+## 📦 Package Details
 - **Backend:** FastAPI, Python 3.13
 - **Frontend:** Next.js 14, TypeScript, Tailwind CSS
 - **Database:** Google Cloud Firestore (Vector Search enabled)
