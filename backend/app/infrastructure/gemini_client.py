@@ -1,4 +1,5 @@
-from typing import Any
+from typing import Any, Optional, Type, List
+from pydantic import BaseModel
 from google import genai
 import vertexai
 from vertexai.language_models import TextEmbeddingModel
@@ -12,7 +13,9 @@ class GeminiClient(AIProvider):
     fully powered by Vertex AI for text and embeddings.
     """
     def __init__(self):
-        # Initialize Vertex AI for the SDK
+        """
+        Initializes the Gemini client with Vertex AI backend and pre-loads the embedding model.
+        """
         try:
             # The new SDK can be initialized to use Vertex AI backend
             self.client = genai.Client(
@@ -37,11 +40,19 @@ class GeminiClient(AIProvider):
     async def generate_response(
         self, 
         prompt: str, 
-        system_instruction: str = None, 
-        response_schema: Any = None
+        system_instruction: Optional[str] = None, 
+        response_schema: Optional[Type[BaseModel]] = None
     ) -> str:
         """
-        Generates a response using the latest Gemini model with optional system instructions and schema.
+        Generates a text response using the configured Gemini model.
+
+        Args:
+            prompt: The user's input question or instruction.
+            system_instruction: Optional guidelines or persona to guide the AI's behavior.
+            response_schema: Optional Pydantic model to enforce a specific JSON output structure.
+
+        Returns:
+            The generated text response.
         """
         try:
             from google.genai import types
@@ -70,16 +81,20 @@ class GeminiClient(AIProvider):
             logger.error(f"Error generating response from Gemini: {str(e)}")
             raise Exception(f"AI Provider Error: {str(e)}")
 
-    async def generate_embedding(self, text: str) -> list[float]:
+    async def generate_embedding(self, text: str) -> List[float]:
         """
         Generates a vector embedding for the given text using Vertex AI.
+
+        Args:
+            text: The string to be vectorized.
+
+        Returns:
+            A list of floats representing the embedding vector.
         """
         if not self.embedding_model:
             raise Exception("Vertex AI Embedding model is not initialized.")
             
         try:
-            # Vertex AI SDK is blocking, but we can run it in a thread pool if needed
-            # For this context, direct call is fine as it's an async service layer
             embeddings = self.embedding_model.get_embeddings([text])
             return embeddings[0].values
         except Exception as e:

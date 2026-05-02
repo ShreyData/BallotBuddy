@@ -44,23 +44,23 @@ BACKEND_URL=$(cat backend_url.txt)
 echo "✅ Backend deployed at: $BACKEND_URL"
 
 # 4. Build and Deploy Frontend
+echo "🖥️ Preparing Frontend environment..."
+# Next.js picks up .env.production during 'next build'
+echo "NEXT_PUBLIC_API_URL=$BACKEND_URL/api/v1" > frontend/.env.production
+
 echo "🖥️ Deploying Frontend to Cloud Run..."
 gcloud run deploy $FRONTEND_SERVICE \
     --source ./frontend \
     --region $REGION \
     --allow-unauthenticated \
-    --set-build-env-vars="NEXT_PUBLIC_API_URL=$BACKEND_URL/api/v1" \
     --set-env-vars="NEXT_PUBLIC_API_URL=$BACKEND_URL/api/v1" \
     --format="value(status.url)" --quiet > frontend_url.txt
 
 FRONTEND_URL=$(cat frontend_url.txt)
 echo "✅ Frontend deployed at: $FRONTEND_URL"
 
-# 5. Update Backend with Frontend URL for CORS security
-echo "🔒 Updating Backend CORS settings to allow Frontend URL..."
-gcloud run services update $BACKEND_SERVICE \
-    --region $REGION \
-    --set-env-vars="BACKEND_CORS_ORIGINS=[\"$FRONTEND_URL\"]" --quiet > /dev/null
+# Cleanup temporary env file
+rm frontend/.env.production
 
 echo "--------------------------------------------------------"
 echo "🎉 DEPLOYMENT SUCCESSFUL!"

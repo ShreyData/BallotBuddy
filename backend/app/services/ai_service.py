@@ -1,3 +1,4 @@
+from typing import Dict, Any
 from fastapi import HTTPException
 from app.infrastructure.ai_provider import AIProvider
 from app.infrastructure.cache import CacheManager
@@ -9,17 +10,30 @@ class AiService:
     Service class for handling AI-powered query logic with session tracking.
     """
     def __init__(self, ai_provider: AIProvider, cache_manager: CacheManager, firestore_client: FirestoreClient):
+        """
+        Initializes the AiService with necessary infrastructure dependencies.
+        """
         self.ai_provider = ai_provider
         self.cache_manager = cache_manager
         self.firestore_client = firestore_client
 
     def _sanitize_input(self, text: str) -> str:
-        """Basic sanitization of user input."""
+        """
+        Basic sanitization of user input.
+        """
         return text.strip()
 
-    async def ask_question(self, user_id: str, question: str) -> dict:
+    async def ask_question(self, user_id: str, question: str) -> Dict[str, Any]:
         """
-        Processes a user question, applies caching, saves to Firestore, and returns an answer.
+        Processes a user question, applies caching, retrieves grounded context, 
+        generates an AI response, and saves the interaction to Firestore.
+
+        Args:
+            user_id: The unique identifier for the user.
+            question: The user's input question.
+
+        Returns:
+            A dictionary containing the AI's answer, confidence, source, and metadata.
         """
         sanitized_question = self._sanitize_input(question)
         

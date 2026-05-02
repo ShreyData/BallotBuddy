@@ -34,8 +34,9 @@ export function useChat() {
         content: response.answer,
       };
       setMessages((prev) => [...prev, aiMessage]);
-    } catch (err: any) {
-      setError(err.message || "Failed to get a response.");
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : "Failed to get a response.";
+      setError(errorMessage);
     } finally {
       setIsLoading(false);
     }
