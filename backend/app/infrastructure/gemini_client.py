@@ -1,12 +1,15 @@
 from typing import Any
 from google import genai
+import vertexai
+from vertexai.language_models import TextEmbeddingModel
 from app.core.config import settings
 from app.infrastructure.ai_provider import AIProvider
 from app.core.logging import logger
 
 class GeminiClient(AIProvider):
     """
-    Google Gemini AI implementation using the modern google-genai SDK.
+    Google Gemini AI implementation using the modern google-genai SDK
+    with Vertex AI for robust embeddings.
     """
     def __init__(self):
         if not settings.GEMINI_API_KEY:
@@ -15,6 +18,15 @@ class GeminiClient(AIProvider):
         # Initialize the new GenAI client
         self.client = genai.Client(api_key=settings.GEMINI_API_KEY)
         self.model_name = 'gemini-2.0-flash' # The current "perfect model" for 2026
+        
+        # Initialize Vertex AI for embeddings
+        try:
+            vertexai.init(project=settings.FIRESTORE_PROJECT_ID, location=settings.GCP_LOCATION)
+            self.embedding_model = TextEmbeddingModel.from_pretrained("text-multilingual-embedding-002")
+            logger.info("Vertex AI Embedding model initialized.")
+        except Exception as e:
+            logger.error(f"Failed to initialize Vertex AI: {e}")
+            self.embedding_model = None
 
     async def generate_response(
         self, 
@@ -54,15 +66,16 @@ class GeminiClient(AIProvider):
 
     async def generate_embedding(self, text: str) -> list[float]:
         """
-        Generates a vector embedding for the given text.
+        Generates a vector embedding for the given text using Vertex AI.
         """
+        if not self.embedding_model:
+            raise Exception("Vertex AI Embedding model is not initialized.")
+            
         try:
-            # Using the embedding model
-            result = self.client.models.embed_content(
-                model='text-embedding-004',
-                contents=text
-            )
-            return result.embeddings[0].values
+            # Vertex AI SDK is blocking, but we can run it in a thread pool if needed
+            # For this context, direct call is fine as it's an async service layer
+            embeddings = self.embedding_model.get_embeddings([text])
+            return embeddings[0].values
         except Exception as e:
-            logger.error(f"Error generating embedding from Gemini: {str(e)}")
+            logger.error(f"Error generating embedding from Vertex AI: {str(e)}")
             raise Exception(f"AI Provider Embedding Error: {str(e)}")

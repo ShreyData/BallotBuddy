@@ -8,6 +8,7 @@ httpx
 python-multipart
 google-genai
 google-cloud-firestore
+google-cloud-aiplatform
 python-json-logger
 python-jose[cryptography]
 passlib[bcrypt]

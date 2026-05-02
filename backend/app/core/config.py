@@ -16,6 +16,7 @@ class Settings(BaseSettings):
     GEMINI_API_KEY: str = ""
     FIRESTORE_PROJECT_ID: str = ""
     GOOGLE_APPLICATION_CREDENTIALS: str = ""
+    GCP_LOCATION: str = "asia-south1"
     REDIS_URL: str = "redis://localhost:6379/0"
     
     model_config = SettingsConfigDict(env_file=".env", case_sensitive=True, extra="ignore")
