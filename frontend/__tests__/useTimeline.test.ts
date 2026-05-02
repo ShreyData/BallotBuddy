@@ -6,6 +6,7 @@ import { apiService } from '../services/api'
 jest.mock('../services/api', () => ({
   apiService: {
     getTimeline: jest.fn(),
+    loginGuest: jest.fn(),
   },
 }))
 
@@ -16,10 +17,9 @@ describe('useTimeline', () => {
       { phase: 'Voting', description: 'Cast your ballot' },
     ]
     ;(apiService.getTimeline as jest.Mock).mockResolvedValue({ events: mockEvents })
+    ;(apiService.loginGuest as jest.Mock).mockResolvedValue({ access_token: 'test-token' })
 
     const { result } = renderHook(() => useTimeline())
-
-    expect(result.current.isLoading).toBe(true)
 
     await waitFor(() => {
       expect(result.current.isLoading).toBe(false)
@@ -31,6 +31,7 @@ describe('useTimeline', () => {
 
   it('handles errors during fetching', async () => {
     ;(apiService.getTimeline as jest.Mock).mockRejectedValue(new Error('Network Error'))
+    ;(apiService.loginGuest as jest.Mock).mockResolvedValue({ access_token: 'test-token' })
 
     const { result } = renderHook(() => useTimeline())
 

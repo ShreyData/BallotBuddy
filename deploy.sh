@@ -37,7 +37,7 @@ gcloud run deploy $BACKEND_SERVICE \
     --source ./backend \
     --region $REGION \
     --allow-unauthenticated \
-    --set-env-vars="FIRESTORE_PROJECT_ID=$PROJECT_ID,GCP_LOCATION=$REGION,REDIS_URL=memory" \
+    --set-env-vars="FIRESTORE_PROJECT_ID=$PROJECT_ID,GCP_LOCATION=$REGION,REDIS_URL=memory,BACKEND_CORS_ORIGINS=[\"*\"]" \
     --format="value(status.url)" --quiet > backend_url.txt
 
 BACKEND_URL=$(cat backend_url.txt)
