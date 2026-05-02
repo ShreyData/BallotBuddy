@@ -1,5 +1,16 @@
 __pycache__
-*.pyc
+*.py[cod]
+*$py.class
+.pytest_cache/
+venv/
+.venv/
+env/
 .env
 tests/
 node_modules/
+.DS_Store
+.git
+.gitignore
+.dockerignore
+Dockerfile
+README.md

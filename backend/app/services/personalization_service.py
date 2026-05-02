@@ -36,4 +36,7 @@ class PersonalizationService:
             }
         except Exception as e:
             logger.error(f"PersonalizationService Error: {str(e)}")
-            raise HTTPException(status_code=500, detail="Failed to generate personalized flow.")
+            raise HTTPException(
+                status_code=500, 
+                detail="An internal error occurred while generating the personalized flow. Please try again later."
+            )

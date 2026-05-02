@@ -16,6 +16,8 @@ build/
 # Misc
 .DS_Store
 *.pem
+service-account.json
+*.json
 
 # Debug
 npm-debug.log*

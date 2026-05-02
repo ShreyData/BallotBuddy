@@ -17,17 +17,19 @@ async def health_check(
         'status': 'healthy',
         'infrastructure': {
             'firestore': 'connected' if firestore.db else 'disconnected',
-            'redis': 'unknown'
+            'cache': 'in-memory'
         }
     }
     
-    # Check Redis
-    try:
-        # Simple ping to Redis
-        await _cache_manager._redis.ping()
-        health_status['infrastructure']['redis'] = 'connected'
-    except Exception:
-        health_status['infrastructure']['redis'] = 'disconnected'
-        health_status['status'] = 'degraded'
+    # Check Redis if enabled
+    if _cache_manager.use_redis:
+        try:
+            await _cache_manager._redis.ping()
+            health_status['infrastructure']['cache'] = 'redis-connected'
+        except Exception:
+            health_status['infrastructure']['cache'] = 'redis-disconnected'
+            health_status['status'] = 'degraded'
+    else:
+        health_status['infrastructure']['cache'] = 'in-memory'
         
     return health_status

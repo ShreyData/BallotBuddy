@@ -32,8 +32,7 @@ export function InputBox({ onSubmit, placeholder = "Type here...", isLoading = f
         id="user-input"
         ref={inputRef}
         type="text"
-...
-
+        value={text}
         onChange={(e) => setText(e.target.value)}
         placeholder={placeholder}
         className="flex-1 p-3 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"

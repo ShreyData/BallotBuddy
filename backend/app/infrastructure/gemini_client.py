@@ -9,24 +9,30 @@ from app.core.logging import logger
 class GeminiClient(AIProvider):
     """
     Google Gemini AI implementation using the modern google-genai SDK
-    with Vertex AI for robust embeddings.
+    fully powered by Vertex AI for text and embeddings.
     """
     def __init__(self):
-        if not settings.GEMINI_API_KEY:
-            logger.warning("GEMINI_API_KEY is not set in environment settings.")
-        
-        # Initialize the new GenAI client
-        self.client = genai.Client(api_key=settings.GEMINI_API_KEY)
-        self.model_name = 'gemini-2.0-flash' # The current "perfect model" for 2026
-        
-        # Initialize Vertex AI for embeddings
+        # Initialize Vertex AI for the SDK
         try:
+            # The new SDK can be initialized to use Vertex AI backend
+            self.client = genai.Client(
+                vertexai=True, 
+                project=settings.FIRESTORE_PROJECT_ID, 
+                location=settings.GCP_LOCATION
+            )
+            self.model_name = 'gemini-2.5-flash'
+            
+            # Explicitly load the embedding model via Vertex AI
             vertexai.init(project=settings.FIRESTORE_PROJECT_ID, location=settings.GCP_LOCATION)
             self.embedding_model = TextEmbeddingModel.from_pretrained("text-multilingual-embedding-002")
-            logger.info("Vertex AI Embedding model initialized.")
+            logger.info("GeminiClient initialized with Vertex AI backend.")
         except Exception as e:
-            logger.error(f"Failed to initialize Vertex AI: {e}")
+            logger.error(f"Failed to initialize GeminiClient with Vertex AI: {e}")
             self.embedding_model = None
+            # Fallback to standard Google AI if Vertex fails initialization
+            if settings.GEMINI_API_KEY:
+                self.client = genai.Client(api_key=settings.GEMINI_API_KEY)
+                logger.info("Falling back to Google AI (API Key) backend.")
 
     async def generate_response(
         self, 

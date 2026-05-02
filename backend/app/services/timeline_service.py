@@ -20,4 +20,7 @@ class TimelineService:
             }
         except Exception as e:
             logger.error(f"TimelineService Error: {str(e)}")
-            raise HTTPException(status_code=500, detail="Failed to retrieve election timeline.")
+            raise HTTPException(
+                status_code=500, 
+                detail="An internal error occurred while retrieving the election timeline. Please try again later."
+            )

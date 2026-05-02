@@ -24,4 +24,7 @@ class ElectionService:
             }
         except Exception as e:
             logger.error(f"ElectionService Error: {str(e)}")
-            raise HTTPException(status_code=500, detail="Failed to retrieve election guide.")
+            raise HTTPException(
+                status_code=500, 
+                detail="An internal error occurred while retrieving the election guide. Please try again later."
+            )

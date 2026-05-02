@@ -60,4 +60,7 @@ class MisinformationService:
                 }
         except Exception as e:
             logger.error(f"MisinformationService Error: {str(e)}")
-            raise HTTPException(status_code=500, detail=f"Failed to verify claim: {str(e)}")
+            raise HTTPException(
+                status_code=500, 
+                detail="An error occurred while verifying the claim. Please try again later."
+            )

@@ -11,6 +11,7 @@ BallotBuddy AI is a secure, grounded, and accessible assistant designed to educa
 - **🛡️ Fact Checker:** Instant verification of election claims using Gemini 2.0 Structured Outputs.
 - **📅 Visual Timeline:** Interactive, accessible roadmap of key election phases.
 - **🗺️ Personalized Guide:** Custom checklists based on user roles (student, voter, first-timer).
+- **MAP (Model Action Plan):** Integrated **`deploy.sh`** for one-click production-grade deployment and scaling.
 
 ---
 
@@ -43,7 +44,7 @@ This project was engineered to exceed every criteria of a Google-level AI challe
 - **Semantic HTML:** Strict adherence to semantic structures for keyboard navigation.
 
 ### ☁️ Google Services Integration
-- **Gemini 2.0 Flash:** Optimized for speed and "Perfect Model" reasoning in 2026.
+- **Gemini 2.5 Flash:** Optimized for speed and "Perfect Model" reasoning in Mumbai (`asia-south1`).
 - **Firestore Vector Search:** Native Google Cloud vector search implementation.
 - **Google GenAI SDK:** Utilizing latest SDK features like `response_schema` and `system_instruction`.
 
@@ -114,14 +115,22 @@ To ensure the AI assistant is grounded in real election facts:
     - Select your database -> **Indexes** -> **Vector**.
     - Create an index for collection `election_facts`, field `embedding`, dimension `768`, distance `COSINE`.
 
+### 5. Production Deployment
+To redeploy the entire stack to Google Cloud Run:
+```bash
+chmod +x deploy.sh
+./deploy.sh
+```
+This script automates API enablement, IAM provisioning, container building via Cloud Build, and cross-service environment injection.
+
 ---
 
 ## 📦 Package Details
 - **Backend:** FastAPI, Python 3.13
 - **Frontend:** Next.js 14, TypeScript, Tailwind CSS
 - **Database:** Google Cloud Firestore (Vector Search enabled)
-- **Cache:** Redis
-- **AI:** Gemini 2.0 Flash
+- **Cache:** Redis (with Serverless Memory Fallback)
+- **AI:** Gemini 2.5 Flash
 
 ## 🤖 Continuous Integration
 This project includes a **GitHub Actions** workflow (`.github/workflows/ci.yml`) that automatically runs backend and frontend tests on every push and pull request, ensuring that security and architectural standards are never compromised.

@@ -82,4 +82,8 @@ class AiService:
             }
         except Exception as e:
             logger.error(f"AiService Error: {str(e)}", extra={"user_id": user_id})
-            raise HTTPException(status_code=500, detail=f"Failed to generate AI response: {str(e)}")
+            # Sanitize error for client to avoid leaking infra details
+            raise HTTPException(
+                status_code=500, 
+                detail="An internal error occurred while generating the AI response. Please try again later."
+            )
