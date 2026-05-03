@@ -53,7 +53,11 @@ export default function EVMSimulator() {
           <p className="text-gray-600">Familiarize yourself with the voting process</p>
         </div>
         {step !== "intro" && (
-          <button onClick={reset} className="p-2 hover:bg-gray-100 rounded-full transition-colors">
+          <button 
+            onClick={reset} 
+            className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+            aria-label="Reset EVM Simulator"
+          >
             <RefreshCcw className="w-5 h-5 text-gray-600" />
           </button>
         )}

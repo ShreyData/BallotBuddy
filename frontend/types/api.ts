@@ -28,3 +28,15 @@ export interface MisinformationResponse {
   is_true: boolean;
   explanation: string;
 }
+
+export interface User {
+  uid: string;
+  email?: string;
+  displayName?: string;
+}
+
+export interface LoginResponse {
+  user: User;
+  status: string;
+}
+

@@ -3,6 +3,7 @@ import {
   ElectionGuideResponse,
   TimelineResponse,
   MisinformationResponse,
+  LoginResponse,
 } from "../types/api";
 
 const getBaseUrl = () => {
@@ -49,14 +50,14 @@ async function fetchWithHandleError(url: string, options: RequestInit = {}) {
 }
 
 export const apiService = {
-  login: async (id_token: string): Promise<any> => {
+  login: async (id_token: string): Promise<LoginResponse> => {
     return fetchWithHandleError(`${API_BASE_URL}/users/login`, {
       method: "POST",
       body: JSON.stringify({ id_token }),
     });
   },
 
-  logout: async (): Promise<any> => {
+  logout: async (): Promise<{ status: string }> => {
     return fetchWithHandleError(`${API_BASE_URL}/users/logout`, {
       method: "POST",
     });

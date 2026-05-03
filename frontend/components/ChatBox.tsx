@@ -68,6 +68,8 @@ function Reasoning({ reasoning, confidence }: { reasoning: string, confidence?: 
     <div className="space-y-2">
       <button 
         onClick={() => setIsOpen(!isOpen)}
+        aria-expanded={isOpen}
+        aria-controls="ai-reasoning-panel"
         className="flex items-center gap-2 text-[10px] font-bold text-blue-600 uppercase tracking-widest hover:text-blue-700 transition-colors"
       >
         <BrainCircuit className="w-3 h-3" />
@@ -76,7 +78,10 @@ function Reasoning({ reasoning, confidence }: { reasoning: string, confidence?: 
       </button>
       
       {isOpen && (
-        <div className="bg-blue-50/50 p-3 rounded-xl border border-blue-100/50 animate-in fade-in slide-in-from-top-1 duration-200">
+        <div 
+          id="ai-reasoning-panel"
+          className="bg-blue-50/50 p-3 rounded-xl border border-blue-100/50 animate-in fade-in slide-in-from-top-1 duration-200"
+        >
           <p className="text-[11px] text-blue-800 leading-relaxed italic">
             &quot;{reasoning}&quot;
           </p>

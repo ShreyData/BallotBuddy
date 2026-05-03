@@ -34,7 +34,7 @@ export function Header() {
               <Globe className="w-4 h-4 text-gray-400" />
               <select 
                 value={language} 
-                onChange={(e) => setLanguage(e.target.value as any)}
+                onChange={(e) => setLanguage(e.target.value as "en" | "hi")}
                 className="bg-transparent text-xs font-bold text-gray-600 focus:outline-none cursor-pointer"
               >
                 <option value="en">English</option>

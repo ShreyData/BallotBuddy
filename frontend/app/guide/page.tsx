@@ -40,8 +40,8 @@ export default function GuidePage() {
     try {
       const res = await apiService.getElectionGuide(role);
       setSteps(res.steps);
-    } catch (err: any) {
-      setError(err.message || "Failed to load guide.");
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Failed to load guide.");
     } finally {
       setIsLoading(false);
     }

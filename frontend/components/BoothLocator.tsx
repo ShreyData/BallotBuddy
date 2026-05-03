@@ -26,7 +26,7 @@ const BoothLocator: React.FC = () => {
           return;
         }
 
-        const loader: any = new MapsLoader({
+        const loader = new MapsLoader({
           apiKey: apiKey,
           version: "weekly",
           libraries: ["places"],
@@ -38,7 +38,7 @@ const BoothLocator: React.FC = () => {
           throw new Error("Initialization failed: Google Maps or Map Container missing");
         }
 
-        const createMarker = (map: any, place: any) => {
+        const createMarker = (map: google.maps.Map, place: google.maps.places.PlaceResult) => {
           if (!place.geometry?.location || !google.maps.Marker) return;
           const marker = new google.maps.Marker({
             map,
@@ -51,14 +51,14 @@ const BoothLocator: React.FC = () => {
           marker.addListener("click", () => infowindow.open(map, marker));
         };
 
-        const searchNearby = (map: any, location: any) => {
+        const searchNearby = (map: google.maps.Map, location: google.maps.LatLngLiteral) => {
           if (!google.maps.places?.PlacesService) return;
           const service = new google.maps.places.PlacesService(map);
           service.nearbySearch(
             { location, radius: 5000, keyword: "polling station election" },
-            (results: any, status: any) => {
+            (results: google.maps.places.PlaceResult[] | null, status: google.maps.places.PlacesServiceStatus) => {
               if (status === google.maps.places.PlacesServiceStatus.OK && results) {
-                results.forEach((place: any) => createMarker(map, place));
+                results.forEach((place) => createMarker(map, place));
               }
             }
           );
@@ -99,7 +99,7 @@ const BoothLocator: React.FC = () => {
         } else {
           searchNearby(newMap, center);
         }
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.error("Map Load Error:", err);
         setError("Failed to initialize map safely.");
         setLoading(false);

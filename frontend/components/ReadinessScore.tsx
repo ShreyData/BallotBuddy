@@ -102,10 +102,10 @@ export default function ReadinessScore() {
               {score === 100 ? "🎉 You are fully prepared!" : `${100 - score}% more to go`}
             </span>
           </div>
-        </div>
-      </div>
-
-      <div className="space-y-3">
+        <div className="relative w-32 h-32 flex items-center justify-center" aria-hidden="true">
+          <svg className="w-full h-full transform -rotate-90">
+        ...
+        <div className="space-y-3">
         {TASKS.map((task) => (
           <div
             key={task.id}
@@ -116,7 +116,10 @@ export default function ReadinessScore() {
             }`}
           >
             <div className="flex items-center gap-4">
-              <button onClick={() => toggleTask(task.id)}>
+              <button 
+                onClick={() => toggleTask(task.id)}
+                aria-label={completedTasks.includes(task.id) ? `Mark "${task.label}" as incomplete` : `Mark "${task.label}" as complete`}
+              >
                 {completedTasks.includes(task.id) ? (
                   <CheckCircle2 className="w-6 h-6 text-green-500" />
                 ) : (
@@ -128,13 +131,16 @@ export default function ReadinessScore() {
               </span>
             </div>
             <Link href={task.link}>
-              <button className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all">
+              <button 
+                className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all"
+                aria-label={`Go to ${task.label} page`}
+              >
                 <ArrowRight className="w-5 h-5" />
               </button>
             </Link>
           </div>
         ))}
-      </div>
+        </div>
     </div>
   );
 }

@@ -41,8 +41,8 @@ export default function MisinformationPage() {
     try {
       const res = await apiService.checkMisinformation(claim);
       setResult(res);
-    } catch (err: any) {
-      setError(err.message || "Failed to verify claim.");
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Failed to verify claim.");
     } finally {
       setIsLoading(false);
     }
