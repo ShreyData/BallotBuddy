@@ -1,7 +1,14 @@
 "use client";
+
+import nextDynamic from "next/dynamic";
+const Timeline = nextDynamic(() => import("../../components/Timeline").then(m => m.Timeline), { 
+  ssr: false,
+  loading: () => <div className="h-[400px] w-full flex items-center justify-center bg-white/40 rounded-3xl animate-pulse">Loading Timeline...</div>
+});
 import { useTimeline } from "../../hooks/useTimeline";
-import { Timeline } from "../../components/Timeline";
 import { Loader } from "../../components/Loader";
+
+
 
 export default function TimelinePage() {
   const { timeline, isLoading, error } = useTimeline();

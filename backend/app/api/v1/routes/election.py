@@ -1,8 +1,13 @@
 from fastapi import APIRouter, Depends
-from app.schemas.election import ElectionGuideRequest, ElectionGuideResponse, PersonalizedFlowRequest, PersonalizedFlowResponse
+
+from app.api.deps import get_current_user_id, get_election_service, get_personalization_service
+from app.schemas.election import (
+    ElectionGuideResponse,
+    PersonalizedFlowRequest,
+    PersonalizedFlowResponse,
+)
 from app.services.election_service import ElectionService
 from app.services.personalization_service import PersonalizationService
-from app.api.deps import get_election_service, get_personalization_service, get_current_user_id
 
 router = APIRouter()
 

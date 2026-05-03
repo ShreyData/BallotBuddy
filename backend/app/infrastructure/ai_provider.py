@@ -1,4 +1,6 @@
 from abc import ABC, abstractmethod
+from typing import Any, List, Union
+
 
 class AIProvider(ABC):
     """
@@ -7,20 +9,12 @@ class AIProvider(ABC):
     @abstractmethod
     async def generate_response(
         self, 
-        prompt: str, 
+        prompt: Union[str, List[Any]], 
         system_instruction: str = None, 
-        response_schema: dict = None
+        response_schema: Any = None
     ) -> str:
         """
         Generates a response for a given prompt with optional system instruction and response schema.
-        
-        Args:
-            prompt: The input prompt for the AI (user input).
-            system_instruction: Guidelines or persona for the AI.
-            response_schema: Optional schema for structured output (as a dict or Pydantic model).
-            
-        Returns:
-            The generated text response (usually JSON if response_schema is provided).
         """
         pass
 

@@ -13,11 +13,6 @@ export function useTimeline() {
       setIsLoading(true);
       setError(null);
       try {
-        // Ensure we have a token
-        if (!localStorage.getItem("bb_auth_token")) {
-          await apiService.loginGuest();
-        }
-        
         const response = await apiService.getTimeline();
         if (isMounted) setTimeline(response.events);
       } catch (err: unknown) {

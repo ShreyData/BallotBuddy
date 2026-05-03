@@ -2,52 +2,42 @@
 node_modules/
 .pnp
 .pnp.js
-
-# Testing
-coverage/
+venv/
+env/
+.venv/
 
 # Next.js
 .next/
 out/
-
-# Production
 build/
-
-# Misc
-.DS_Store
-*.pem
-service-account.json
-*.json
-
-# Debug
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-.pnpm-debug.log*
-
-# Local env files
-.env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
-
-# Vercel
-.vercel
-
-# TypeScript
-*.tsbuildinfo
-next-env.d.ts
 
 # Python
 __pycache__/
 *.py[cod]
 *$py.class
 .pytest_cache/
-venv/
-.venv/
-env/
+.ruff_cache/
+.coverage
+coverage/
+
+# Testing
+cypress/videos/
+cypress/screenshots/
+
+# Misc
+.DS_Store
+*.pem
+*.log
+.gemini/
+
+# Env files (Security)
 .env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env.production
+service-account.json
 
 # Docker
 .dockerignore
@@ -59,5 +49,8 @@ docker-compose.override.yml
 *.swp
 *.swo
 
-.gemini/
-
+# Infrastructure
+infra/backend_url.txt
+infra/frontend_url.txt
+backend_url.txt
+frontend_url.txt

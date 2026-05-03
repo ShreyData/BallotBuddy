@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends
+
 from app.api.deps import get_firestore_client
 from app.infrastructure.cache import CacheManager
 from app.infrastructure.firestore_client import FirestoreClient

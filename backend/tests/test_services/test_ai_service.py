@@ -18,16 +18,25 @@ def mock_firestore_client():
     return AsyncMock()
 
 @pytest.fixture
-def ai_service(mock_ai_provider, mock_cache_manager, mock_firestore_client):
+def mock_translation_client():
+    client = MagicMock()
+    client.detect_language.return_value = "en"
+    client.translate_text.side_effect = lambda text, target_language: text
+    return client
+
+@pytest.fixture
+def ai_service(mock_ai_provider, mock_cache_manager, mock_firestore_client, mock_translation_client):
     return AiService(
         ai_provider=mock_ai_provider, 
         cache_manager=mock_cache_manager,
-        firestore_client=mock_firestore_client
+        firestore_client=mock_firestore_client,
+        translation_client=mock_translation_client
     )
 
 @pytest.mark.asyncio
 async def test_ask_question_valid(ai_service, mock_ai_provider, mock_firestore_client, mock_cache_manager):
-    mock_ai_provider.generate_response.return_value = "This is an answer."
+    # Mock structured response
+    mock_ai_provider.generate_response.return_value = '{"answer": "This is an answer.", "reasoning": "Because I said so.", "confidence_score": 0.99}'
     mock_ai_provider.generate_embedding.return_value = [0.1, 0.2]
     mock_firestore_client.query_knowledge_base.return_value = ["Fact 1"]
     mock_cache_manager.get.return_value = None
@@ -36,10 +45,12 @@ async def test_ask_question_valid(ai_service, mock_ai_provider, mock_firestore_c
     
     assert response["answer"] == "This is an answer."
     assert response["source"] == "gemini"
+    assert response["confidence_score"] == 0.99
     mock_ai_provider.generate_embedding.assert_called_once()
     mock_firestore_client.query_knowledge_base.assert_called_once()
     mock_ai_provider.generate_response.assert_called_once()
     mock_firestore_client.save_user_query.assert_called_once()
+    mock_firestore_client.log_analytics.assert_called_once()
 
 @pytest.mark.asyncio
 async def test_ask_question_empty(ai_service):

@@ -1,9 +1,12 @@
+from datetime import datetime, timezone
+
 from google.cloud import firestore
-from google.cloud.firestore_v1.vector import Vector
 from google.cloud.firestore_v1.base_vector_query import DistanceMeasure
+from google.cloud.firestore_v1.vector import Vector
+
 from app.core.config import settings
 from app.core.logging import logger
-from datetime import datetime
+
 
 class FirestoreClient:
     """
@@ -32,19 +35,56 @@ class FirestoreClient:
         try:
             # Main session document metadata
             doc_ref = self.db.collection("sessions").document(user_id)
-            await doc_ref.set({"last_updated": datetime.utcnow()}, merge=True)
+            await doc_ref.set({"last_updated": datetime.now(timezone.utc)}, merge=True)
             
             # Subcollection for queries (unbounded growth handled correctly)
             query_data = {
                 "question": query,
                 "answer": response.get("answer", ""),
-                "timestamp": datetime.utcnow()
+                "timestamp": datetime.now(timezone.utc)
             }
             await doc_ref.collection("queries").add(query_data)
             
             logger.info(f"Successfully saved query to subcollection for user: {user_id}")
         except Exception as e:
             logger.error(f"Error saving query to Firestore for user {user_id}: {e}")
+
+    async def log_analytics(self, analytics_data: dict) -> None:
+        """
+        Logs detailed query analytics to a central collection.
+        """
+        if not self.db:
+            return
+        try:
+            await self.db.collection("query_logs").add({
+                **analytics_data,
+                "timestamp": datetime.now(timezone.utc)
+            })
+        except Exception as e:
+            logger.error(f"Error logging analytics: {e}")
+
+    async def get_trending_topics(self, limit: int = 5) -> list[dict]:
+        """
+        Retrieves common queries to simulate trending topics.
+        """
+        if not self.db:
+            return []
+        try:
+            # Simple simulation: get last 50 queries and return them as 'trending'
+            docs = self.db.collection("query_logs").order_by("timestamp", direction=firestore.Query.DESCENDING).limit(50).stream()
+            questions = []
+            async for doc in docs:
+                data = doc.to_dict()
+                if "question" in data:
+                    questions.append(data["question"])
+            
+            # Count frequencies (simplified)
+            from collections import Counter
+            counts = Counter(questions)
+            return [{"topic": topic, "count": count} for topic, count in counts.most_common(limit)]
+        except Exception as e:
+            logger.error(f"Error getting trending topics: {e}")
+            return []
 
     async def get_user_history(self, user_id: str, limit: int = 20) -> list:
         """

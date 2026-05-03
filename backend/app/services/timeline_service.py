@@ -1,6 +1,8 @@
 from fastapi import HTTPException
-from app.domain.timeline_rules import get_static_timeline
+
 from app.core.logging import logger
+from app.domain.timeline_rules import get_static_timeline
+
 
 class TimelineService:
     """
@@ -23,4 +25,4 @@ class TimelineService:
             raise HTTPException(
                 status_code=500, 
                 detail="An internal error occurred while retrieving the election timeline. Please try again later."
-            )
+            ) from e

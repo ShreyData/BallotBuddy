@@ -1,6 +1,8 @@
 from fastapi import HTTPException
-from app.domain.election_rules import get_rules_for_role
+
 from app.core.logging import logger
+from app.domain.election_rules import get_rules_for_role
+
 
 class ElectionService:
     """
@@ -27,4 +29,4 @@ class ElectionService:
             raise HTTPException(
                 status_code=500, 
                 detail="An internal error occurred while retrieving the election guide. Please try again later."
-            )
+            ) from e

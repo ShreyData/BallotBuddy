@@ -1,5 +1,7 @@
-from pydantic import BaseModel, Field
 from typing import List
+
+from pydantic import BaseModel, Field
+
 
 class ElectionGuideRequest(BaseModel):
     role: str = Field(..., min_length=1, max_length=50, description="The user's role (e.g., voter, student).")

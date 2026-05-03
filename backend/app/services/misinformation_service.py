@@ -1,9 +1,9 @@
-import json
 from fastapi import HTTPException
-from app.infrastructure.ai_provider import AIProvider
-from app.core.logging import logger
 
+from app.core.logging import logger
+from app.infrastructure.ai_provider import AIProvider
 from app.schemas.ai import MisinformationResult
+
 
 class MisinformationService:
     """
@@ -63,4 +63,4 @@ class MisinformationService:
             raise HTTPException(
                 status_code=500, 
                 detail="An error occurred while verifying the claim. Please try again later."
-            )
+            ) from e

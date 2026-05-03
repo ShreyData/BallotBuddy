@@ -1,0 +1,11 @@
+.gcloudignore
+.git
+.gitignore
+node_modules
+npm-debug.log
+.next
+.swc
+cypress
+coverage
+__tests__
+.dockerignore

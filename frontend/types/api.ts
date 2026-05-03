@@ -1,9 +1,11 @@
 export interface AIQueryResponse {
   answer: string;
-  confidence: number;
+  reasoning?: string;
+  confidence_score?: number;
   source: string;
   type: string;
   structured: boolean;
+  language: string;
 }
 
 export interface ElectionGuideResponse {
@@ -14,6 +16,7 @@ export interface ElectionGuideResponse {
 export interface TimelinePhase {
   phase: string;
   description: string;
+  date?: string;
 }
 
 export interface TimelineResponse {
